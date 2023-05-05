@@ -1,0 +1,809 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <link rel="stylesheet" href="//code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css">
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.9.1/font/bootstrap-icons.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.js"></script>
+    <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.js"></script>
+<style>
+
+</style>
+</head>
+<body onload="getStatus(), loadMyDatesTimes(), loadMyPeriodTimes(), loadExceptionsDates(), showStatesFunction()">
+
+<div class="header">
+ <h3>Èasové relé <div class="hostname" id="hostname"></div></h3>
+</div>
+
+<div class="topnav">
+  <a href="#states" onclick="showStatesFunction()"><i class="bi bi-info-circle"></i> Stav</a>
+  <a href="#timers" onclick="showTimersFunction()"><i class="bi bi-clock"></i> Èasovaèe blokace</a>
+  <a href="#schedule" onclick="showScheduleFunction()"><i class="bi bi-calendar-week"></i> Èasovaèe ovládání</a>
+  <a href="#settings" onclick="showSettingsFunction()"><i class="bi bi-gear"></i> Konfigurace</a>
+</div>
+
+<div class="states" id="states" style="display:block">
+    <div class="card">
+      <h2>Stavy</h2>
+       <table id="dev_states">
+        <tr>
+            <th><i class="bi bi-clock"></i> Aktuální datum a èas: </th>
+            <td id="time"></td>
+        </tr>
+        <tr>
+            <th><i class="bi bi-sign-stop"></i> Relé 1 (blokace): </th>
+            <td id="relay1"></td>
+        </tr>
+        <tr>
+            <th><i class="bi bi-dpad"></i> Relé 2 (ovládání): </th>
+            <td id="relay2"></td>
+        </tr>
+        <tr>
+            <th><i class="bi bi-box-arrow-in-right"></i> Vstup 1: </th>
+            <td id="input1"></td>
+        </tr>
+        <tr>
+            <th><i class="bi bi-box-arrow-in-right"></i> Vstup 2: </th>
+            <td id="input2"></td>
+        </tr>
+       </table>
+       
+      <h2>Funkce</h2>
+       <table id="dev_states">
+        <tr>
+            <th><i class="bi bi-arrow-repeat"></i> Periodické blokování: </th>
+            <td id="statePeriodics"></td>
+        </tr>
+        <tr>
+            <th><i class="bi bi-briefcase-fill"></i> Svátky: </th>
+            <td id="stateHolidays"></td>
+        </tr>
+        <tr>
+            <th><i class="bi bi-lock"></i> Vyjímky: </th>
+            <td id="stateExceptions"></td>
+        </tr>
+        <tr>
+            <th><i class="bi bi-calendar-week"></i> Vlastní datumy: </th>
+            <td id="stateMyDates"></td>
+        </tr>
+        <tr>
+            <th><i class="bi bi-box-arrow-right"></i> Periodické ovládání: </th>
+            <td id="stateMyControl"></td>
+        </tr>
+        <tr>
+            <th><i class="bi bi-calendar2-check"></i> Vlastní datumy - periodické ovládání: </th>
+            <td id="stateMyDatesControl"></td>
+        </tr>
+       </table>
+    </div>
+</div>
+  
+<div class="timers" id="timers" style="display:block">
+    <form action="/saveSettings" method="POST">
+   <div class="PeriodicTimesTable" id="PeriodicTimesTable" style="display:block">
+        <p></p>
+            <label for="myCheck"><h3><i class="bi bi-arrow-repeat"></i> Periodické spínání <span style="font-size:10px;">Spíná relé v nastavené dny a mezi nastavenými èasy.</span></h3>
+            <label class="switch"><input type="checkbox" name="F0" id="CheckPeriodicTimes" onchange="toggleCheckboxFunction(this)"><span class="slider"></span></label> 
+            <p></p>
+            <table id="periods">
+                <tr>
+                    <th>PO</th>
+                    <th>ÚT</th>
+                    <th>ST</th>
+                    <th>ÈT</th>
+                    <th>PÁ</th>
+                    <th>SO</th>
+                    <th>NE</th>
+                </tr>
+                <tr>
+                    <td><input type="checkbox" name="monday" id="CheckMondays" onclick="toggleCheckboxHolidayDates(this)()"></td>
+                    <td><input type="checkbox" name="tuesday" id="CheckTuesdays" onclick="toggleCheckboxHolidayDates(this)"></td>
+                    <td><input type="checkbox" name="wednesday" id="CheckWednesdays" onclick="toggleCheckboxHolidayDates(this)"></td>
+                    <td><input type="checkbox" name="thursday" id="CheckThursdays" onclick="toggleCheckboxHolidayDates(this)"></td>
+                    <td><input type="checkbox" name="friday" id="CheckFridays" onclick="toggleCheckboxHolidayDates(this)"></td>
+                    <td><input type="checkbox" name="saturday" id="CheckSaturdays" onclick="toggleCheckboxHolidayDates(this)"></td>
+                    <td><input type="checkbox" name="sunday" id="CheckSundays" onclick="toggleCheckboxHolidayDates(this)"></td>
+                </tr>
+            </table>
+            <table id="period_times">
+                <tr>
+                    <td><label for="inputStartPeriodicTimes"><b>Od: </b></label></td>
+                    <td><input style="width:100px;" type="text" id="startTime6" name="startTime6" placeholder="" value=""></td>
+                </tr>
+                <tr>
+                    <td><label for="inputStopPeriodicTimes"><b> Do: </b></label></td>
+                    <td><input style="width:100px;" type="text" id="endTime6" name="endTime6" placeholder="" value=""></td>
+                </tr>
+            </table>
+            
+    </div>
+
+    <div class="HolidaysTimesTable" id="" style="display:block">
+        <p></p>
+            <label for="myCheck"><h3><i class="bi bi-briefcase"></i> CZ Svátky <span style="font-size:10px;">Bìhem svátkù se nenastavuje èas spínání - celý den je VYPNUTÝ.</span></h3></label>
+            <label class="switch"><input type="checkbox" name="F1" id="CheckHolidays" onchange="toggleCheckboxFunction(this)"><span class="slider"></span></label>
+        <p></p>
+        <table id="holidays">
+            <tr>
+                <th> </th>
+                <th>Popis:</th>
+            </tr>
+            <tr>
+                <td>1. Ledna</td>
+                <td>Nový rok / Den obnovy samostatného èeského státu</td>
+            </tr>
+            <tr>
+                <td>Variabilnì</td>
+                <td>Velký pátek</td>
+            </tr>
+            <tr>
+                <td>Variabilnì</td>
+                <td>Velikonoèní pondìlí</td>
+            </tr>
+            <tr>
+                <td>1. Kvìtna</td>
+                <td>Svátek práce</td>
+            </tr>
+            <tr>
+                <td>8. Kvìtna</td>
+                <td>Den vítìzství</td>
+            </tr>
+            <tr>
+                <td>5. Èervence</td>
+                <td>Den vìrozvìstù Cyrila a Metodìje</td>
+            </tr>
+            <tr>
+                <td>6. Èervence</td>
+                <td>Den upálení mistra Jana Husa</td>
+            </tr>
+            <tr>
+                <td>28. Záøí</td>
+                <td>Den èeské státnosti</td>
+            </tr>
+            <tr>
+                <td>28. Øíjna</td>
+                <td>Den vzniku Èeskoslovenska</td>
+            </tr>
+            <tr>
+                <td>17. Listopadu</td>
+                <td>Den boje za svobodu a demokracii</td>
+            </tr>
+            <tr>
+                <td>24. Prosince</td>
+                <td>Štìdrý den</td>
+            </tr>
+            <tr>
+                <td>25. Prosince</td>
+                <td>1. svátek vánoèní</td>
+            </tr>
+            <tr>
+                <td>26. Prosince</td>
+                <td>2. svátek vánoèní</td>
+            </tr>
+        </table>
+    </div>
+
+    <div class="ExceptionsTable" id="ExceptionsTable" style="display:block">
+        <p></p>
+            <label for="myCheck"><h3><i class="bi bi-lock"></i> Vyjímky <span style="font-size:10px;">Nastavuje vyjímky v periodickém spínání - celý den je VYPNUTÝ.</span></h3></label>
+            <label class="switch"><input type="checkbox" name="F2" id="CheckExceptions" onchange="toggleCheckboxFunction(this)"><span class="slider"></span></label> 
+        <p></p>
+       <table>
+      
+        <tr>
+            <td>Datum 1:</td>
+            <td><input type="text" id="date11" name="date11" placeholder="" value=""></td>
+        </tr>
+        <tr>
+            <td>Datum 2:</td>
+            <td><input type="text" id="date12" name="date12" placeholder="" value=""></td>
+        </tr>
+        <tr>
+            <td>Datum 3:</td>
+            <td><input type="text" id="date13" name="date13" placeholder="" value=""></td>
+        </tr>
+        <tr>
+            <td>Datum 4:</td>
+            <td><input type="text" id="date14" name="date14" placeholder="" value=""></td>
+        </tr>
+        <tr>
+            <td>Datum 5:</td>
+            <td><input type="text" id="date15" name="date15" placeholder="" value=""></td>
+        </tr>
+        </table>
+    </div>
+    
+    <div class="myDatesTimesTable" id="myDatesTimesTable" style="display:block">
+        <p></p>
+            <label for="myCheck"><h3><i class="bi bi-calendar3"></i> Vlastní datumy <span style="font-size:10px;">Spíná relé v nastavené dny a èasy - nadøazuje periodickou funkci, svátky i vyjímky.</span></h3></label>
+            <label class="switch"><input type="checkbox" name="F3" id="CheckMyDates" onchange="toggleCheckboxFunction(this)"><span class="slider"></span></label> 
+        <p></p>
+       <table>
+        <tr>
+            <th></th>
+            <th>Datum od:</th>
+            <th>Datum do:</th>
+            <th>Èas od: </th>
+            <th>Èas do: </th>
+        </tr>
+        <tr>
+            <td>Datum 1:</td>
+            <td><input type="text" id="date1" name="date1" placeholder="" value=""></td>
+            <td><input type="text" id="date2" name="date2" placeholder="" value=""></td>
+            <td><input type="text" id="startTime1" name="startTime1" placeholder="" value=""></td>
+            <td><input type="text" id="endTime1" name="endTime1" placeholder="" value=""></td>
+        </tr>
+        <tr>
+            <td>Datum 2:</td>
+            <td><input type="text" id="date3" name="date3" placeholder="" value=""></td>
+            <td><input type="text" id="date4" name="date4" placeholder="" value=""></td>
+            <td><input type="text" id="startTime2" name="startTime2" placeholder="" value=""></td>
+            <td><input type="text" id="endTime2" name="endTime2" placeholder="" value=""></td>
+        </tr>
+        <tr>
+            <td>Datum 3:</td>
+            <td><input type="text" id="date5" name="date5" placeholder="" value=""></td>
+            <td><input type="text" id="date6" name="date6" placeholder="" value=""></td>
+            <td><input type="text" id="startTime3" name="startTime3" placeholder="" value=""></td>
+            <td><input type="text" id="endTime3" name="endTime3" placeholder="" value=""></td
+        </tr>
+        <tr>
+            <td>Datum 4:</td>
+            <td><input type="text" id="date7" name="date7" placeholder="" value=""></td>
+            <td><input type="text" id="date8" name="date8" placeholder="" value=""></td>
+            <td><input type="text" id="startTime4" name="startTime4" placeholder="" value=""></td>
+            <td><input type="text" id="endTime4" name="endTime4" placeholder="" value=""></td>
+        </tr>
+        <tr>
+            <td>Datum 5:</td>
+            <td><input type="text" id="date9" name="date9" placeholder="" value=""></td>
+            <td><input type="text" id="date10" name="date10" placeholder="" value=""></td>
+            <td><input type="text" id="startTime5" name="startTime5" placeholder="" value=""></td>
+            <td><input type="text" id="endTime5" name="endTime5" placeholder="" value=""></td>
+        </tr>
+        </table>
+    </div>
+        
+       <p><input type="submit" value="ULOŽIT"></p>
+       <p></p>
+      </form> 
+</div>
+
+<div class="schedule" id="schedule" style="display:none">
+    <form action="/saveSettings" method="POST">
+    
+    <div class="ControlTimesTable" id="ControlTimesTable" style="display:block">
+        <p></p>
+            <label for="myCheck"><h3><i class="bi bi-box-arrow-right"></i> Periodické ovládání <span style="font-size:10px;">Impulznì spíná relé v nastavené dny v nastavený èas, pøi svátcích je funkce blokována.</span></h3>
+            <label class="switch"><input type="checkbox" name="F4" id="CheckControl" onchange="toggleCheckboxFunction(this)"><span class="slider"></span></label> 
+            <p></p>
+            <table id="periods">
+                <tr>
+                    <th>PO</th>
+                    <th>ÚT</th>
+                    <th>ST</th>
+                    <th>ÈT</th>
+                    <th>PÁ</th>
+                    <th>SO</th>
+                    <th>NE</th>
+                </tr>
+                <tr>
+                    <td><input type="checkbox" name="monday_ctrl" id="CheckMondaysControl" onclick="toggleCheckboxControlDates(this)()"></td>
+                    <td><input type="checkbox" name="tuesday_ctrl" id="CheckTuesdaysControl" onclick="toggleCheckboxControlDates(this)"></td>
+                    <td><input type="checkbox" name="wednesday_ctrl" id="CheckWednesdaysControl" onclick="toggleCheckboxControlDates(this)"></td>
+                    <td><input type="checkbox" name="thursday_ctrl" id="CheckThursdaysControl" onclick="toggleCheckboxControlDates(this)"></td>
+                    <td><input type="checkbox" name="friday_ctrl" id="CheckFridaysControl" onclick="toggleCheckboxControlDates(this)"></td>
+                    <td><input type="checkbox" name="saturday_ctrl" id="CheckSaturdaysControl" onclick="toggleCheckboxControlDates(this)"></td>
+                    <td><input type="checkbox" name="sunday_ctrl" id="CheckSundaysControl" onclick="toggleCheckboxControlDates(this)"></td>
+                </tr>
+            </table>
+            <table id="period_times">
+                <tr>
+                    <td><label for="inputStartPeriodicTimes"><b>Zapnout v:  </b></label></td>
+                    <td><input style="width:100px;" type="text" id="startTime7" name="startTime7" placeholder="" value=""></td>
+                </tr>
+            </table>
+    </div>
+    
+    <div class="MyDatesControl" id="MyDatesControl" style="display:block">
+        <p></p>
+            <label for="myCheck"><h3><i class="bi bi-calendar2-check"></i> Vlastní datumy - ovládání <span style="font-size:10px;">Impulznì spíná relé v nastavené dny v poèáteèní nastavený èas.</span></h3>
+            <label class="switch"><input type="checkbox" name="F5" id="MyDatesCheckControl" onchange="toggleCheckboxFunction(this)"><span class="slider"></span></label> 
+            <p></p>
+    </div>
+    <p></p>
+            <table>
+               <tr>
+                    <th>Délka impulzu (s):  </th>
+                    <td><input style="width:100px;" type="text" id="r2_impuls" name="r2_impuls" placeholder=""></td>
+                    <td> nastavuje délku sepnutého stavu ovládacího relé</td>
+                </tr>
+            </table>
+    <p><input type="submit" value="ULOŽIT"></p>
+    <p></p>
+    <p><button onclick="window.location.href='relay2on';" class="WifiButton">Sepnout ovládací relé</button></p>
+    
+    </form> 
+</div>
+
+<div class="settings" id="settings" style="display:none">
+    <form action="/saveSettings" method="POST">
+    <div class="card">
+      <h2>Nastavení</h2>
+      <table>
+        <tr>
+            <th>Hostname:</th>
+            <td><input type="text" id="Hostname" name="hostname" placeholder=""></td>
+            <td>max. 16 znakù</td>
+            
+        </tr>
+        <tr>
+            <th>NTP server:</th>
+            <td><input type="text" id="ntpServer" name="ntpServer" placeholder="" value=""></td>
+            <td>vých. = europe.pool.ntp.org</td>
+        </tr>
+        <tr>
+            <th>NTP offset:</th>
+            <td><input type="text" id="ntpOffset" name="ntpOffset" placeholder="" value=""></td>
+            <td>(s) vých. = 0 / UTC+1 = 3600 / UTC+2 = 7200 ...</td>
+        </tr>
+        <tr>
+            <th>NTP update interval:</th>
+            <td><input type="text" id="ntpUpdate" name="ntpUpdate" placeholder="" value=""></td>
+            <td>(s)</td>
+        </tr>
+        <tr>
+            <th>WWW heslo:</th>
+            <td><input type="text" id="www_password" name="www_password" placeholder="" value=""></td>
+            <td>max. 16 znakù</td>
+        </tr>
+      </table>
+    </div>
+    <p><input type="submit" value="ULOŽIT"></p>
+    <p></p>
+    <p><button onclick="window.location.href='wifireset';" class="WifiButton">Wifi RESET</button></p>
+    <p></p>
+    <p><button onclick="window.location.href='cleareeprom';" class="EepromButton">EEPROM RESET</button></p>
+    <p></p>
+    </form> 
+</div>
+
+<!-------------------------JavaScrip------------------------->
+<script>
+function showStatesFunction() {
+  document.getElementById("states").style.display = "block";
+  document.getElementById("timers").style.display = "none";
+  document.getElementById("schedule").style.display = "none";
+  document.getElementById("settings").style.display = "none";
+}
+function showTimersFunction() {
+  document.getElementById("states").style.display = "none";
+  document.getElementById("timers").style.display = "block";
+  document.getElementById("schedule").style.display = "none";
+  document.getElementById("settings").style.display = "none";
+}
+function showScheduleFunction() {
+  document.getElementById("states").style.display = "none";
+  document.getElementById("timers").style.display = "none";
+  document.getElementById("schedule").style.display = "block";
+  document.getElementById("settings").style.display = "none";
+}
+function showSettingsFunction() {
+  document.getElementById("states").style.display = "none";
+  document.getElementById("timers").style.display = "none";
+  document.getElementById("schedule").style.display = "none";
+  document.getElementById("settings").style.display = "block";
+}
+    setInterval(function() {
+      getStatus();
+      //getFunctions();
+    }, 1000);
+
+    //-------------------------------------------------------
+   
+    function toggleCheckboxFunction(element) {
+        var xhr = new XMLHttpRequest();
+        var fceName = element.name ;
+        let LinkFceOn = "/update?"+ fceName + "state=1" ;
+        let LinkFceOff = "/update?"+ fceName + "state=0" ;
+        if (element.checked) {
+            xhr.open("GET", LinkFceOn, true);
+            } else {
+            xhr.open("GET", LinkFceOff, true);
+            }
+            xhr.send();
+            getStatus();
+        }
+    
+    function toggleCheckboxHolidayDates(element) {
+        var xhr = new XMLHttpRequest();
+        //var cbID = element.id ;
+        var WeekDay = element.name ;
+        let LinkStringOn = "/setWeekdays?" + WeekDay + "=1" ;
+        let LinkStringOff = "/setWeekdays?" + WeekDay + "=0" ;
+        if (element.checked == true ) {
+                    xhr.open("GET", LinkStringOn, true);
+                } else {
+                    xhr.open("GET", LinkStringOff, true);
+                }
+            xhr.send();
+            //getStatus();
+        }
+    
+    function toggleCheckboxControlDates(element) {
+        var xhr = new XMLHttpRequest();
+        //var cbID = element.id ;
+        var WeekDayCtrl = element.name ;
+        let LinkStringOn = "/setWeekdaysControl?" + WeekDayCtrl + "=1" ;
+        let LinkStringOff = "/setWeekdaysControl?" + WeekDayCtrl + "=0" ;
+        if (element.checked == true ) {
+                    xhr.open("GET", LinkStringOn, true);
+                } else {
+                    xhr.open("GET", LinkStringOff, true);
+                }
+            xhr.send();
+            //getStatus();
+        }
+       
+    function getStatus() {
+        var xhr = new XMLHttpRequest();
+        xhr.onreadystatechange = function()    {
+            if (this.readyState == 4 && this.status == 200)  {
+                var myObj = JSON.parse(this.responseText);
+                var checkBoxPeriodicTimes = myObj.FunctionPeriodic ;
+                var checkBoxHolidaysTimes = myObj.FunctionHolidays ;
+                var checkboxExceptions = myObj.FunctionExceptions ;
+                var checkBoxMyDatesTimes = myObj.FunctionMyDates ;
+                var checkBoxPeriodicControl = myObj.FunctionPeriodicControl ;
+                var checkBoxMyDatesControl = myObj.FunctionMyDatesControl ;
+                var DateTime = myObj.DateTime ;
+                var Relay1st = myObj.Relay1State ;
+                var Relay2st = myObj.Relay2State ;
+                var Input1 = myObj.Input1State ;
+                var Input2 = myObj.Input2State ;
+                var Hostname = myObj.Hostname ;
+                var NTPoffset = myObj.NTPoffset ;
+                var NTPserver = myObj.NTPserver ;
+                var NTPinterval = myObj.NTPinterval ;
+                var R2ImpLenght = myObj.REL2_interval ;
+                var input1Checked ;
+                var input2Checked ;
+                let statePeriodics ;
+                let stateHolidays ;
+                let stateExceptions ;
+                let stateMyDates ;
+                let stateMyControl ;
+                let stateMyDatesControl ;
+                let output1StateM ;
+                let output2StateM ;
+                let input1state ;
+                let input2state ;
+                
+                if (Relay1st == 1){ 
+                    input1Checked = true ;
+                    document.getElementById("relay1").style.color = "red";
+                    output1StateM = "ZAPNUTO";
+                } else { 
+                    input1Checked = false ;
+                    document.getElementById("relay1").style.color = "black";
+                    output1StateM = "VYPNUTO";
+                }
+                if (Relay2st == 1){ 
+                    input2Checked = true;
+                    document.getElementById("relay2").style.color = "red";
+                    output2StateM = "ZAPNUTO";
+                } else { 
+                    input2Checked = false;
+                    document.getElementById("relay2").style.color = "black";
+                    output2StateM = "VYPNUTO";
+                }
+                if (Input1 == 0){ 
+                    document.getElementById("input1").style.color = "red";
+                    input1state = "AKTIVNÍ";
+                } else { 
+                    document.getElementById("input1").style.color = "black";
+                    input1state = "NEAKTIVNÍ";
+                }
+                if (Input2 == 0){ 
+                    document.getElementById("input2").style.color = "red";
+                    input2state = "AKTIVNÍ";
+                } else { 
+                    document.getElementById("input2").style.color = "black";
+                    input2state = "NEAKTIVNÍ";
+                }
+                //---------------------------
+                
+                if (checkBoxPeriodicTimes == true ) {
+                    document.getElementById("CheckPeriodicTimes").checked = true ;
+                    document.getElementById("statePeriodics").style.color = "red";
+                    statePeriodics = "ZAPNUTO" ;
+                } else {
+                    document.getElementById("CheckPeriodicTimes").checked = false ;
+                    document.getElementById("statePeriodics").style.color = "black";
+                    statePeriodics = "VYPNUTO" ;
+                }
+                
+                if (checkBoxHolidaysTimes == true){
+                    document.getElementById("CheckHolidays").checked = true ;
+                    document.getElementById("stateHolidays").style.color = "red";
+                    stateHolidays = "ZAPNUTO" ;
+                } else {
+                    document.getElementById("CheckHolidays").checked = false ;
+                    document.getElementById("stateHolidays").style.color = "black";
+                    stateHolidays = "VYPNUTO" ;
+                }
+                
+                if (checkboxExceptions == true){
+                    document.getElementById("CheckExceptions").checked = true ;
+                    document.getElementById("stateExceptions").style.color = "red";
+                    stateExceptions = "ZAPNUTO" ;
+                } else {
+                    document.getElementById("CheckExceptions").checked = false ;
+                    document.getElementById("stateExceptions").style.color = "black";
+                    stateExceptions = "VYPNUTO" ;
+                }
+                
+                if (checkBoxMyDatesTimes == true){
+                    document.getElementById("CheckMyDates").checked = true ;
+                    document.getElementById("stateMyDates").style.color = "red";
+                    stateMyDates = "ZAPNUTO" ;
+                } else {
+                    document.getElementById("CheckMyDates").checked = false ;
+                    document.getElementById("stateMyDates").style.color = "black";
+                    stateMyDates = "VYPNUTO" ;
+                }
+                if (checkBoxPeriodicControl == true){
+                    document.getElementById("CheckControl").checked = true ;
+                    document.getElementById("stateMyControl").style.color = "red";
+                    stateMyControl = "ZAPNUTO" ;
+                } else {
+                    document.getElementById("CheckControl").checked = false ;
+                    document.getElementById("stateMyControl").style.color = "black";
+                    stateMyControl = "VYPNUTO" ;
+                }
+                if (checkBoxMyDatesControl == true){
+                    document.getElementById("MyDatesCheckControl").checked = true ;
+                    document.getElementById("stateMyDatesControl").style.color = "red";
+                    stateMyDatesControl = "ZAPNUTO" ;
+                } else {
+                    document.getElementById("MyDatesCheckControl").checked = false ;
+                    document.getElementById("stateMyDatesControl").style.color = "black";
+                    stateMyDatesControl = "VYPNUTO" ;
+                }
+                
+                //------------STAVY--------------
+                document.getElementById("statePeriodics").innerHTML = statePeriodics ;
+                document.getElementById("stateHolidays").innerHTML = stateHolidays ;
+                document.getElementById("stateExceptions").innerHTML = stateExceptions ;
+                document.getElementById("stateMyDates").innerHTML = stateMyDates ;
+                document.getElementById("stateMyControl").innerHTML = stateMyControl ;
+                document.getElementById("stateMyDatesControl").innerHTML = stateMyControl ;
+                document.getElementById("time").innerHTML = DateTime;
+                //document.getElementById("output1").checked = input1Checked;
+                //document.getElementById("output2").checked = input2Checked;
+                document.getElementById("relay1").innerHTML = output1StateM;
+                document.getElementById("relay2").innerHTML = output2StateM;
+                document.getElementById("input1").innerHTML = input1state;
+                document.getElementById("input2").innerHTML = input2state;
+                document.getElementById("hostname").innerHTML = Hostname ;
+                document.getElementById("Hostname").placeholder = Hostname ;
+                document.getElementById("ntpServer").placeholder = NTPserver ;
+                document.getElementById("ntpOffset").placeholder = NTPoffset ;
+                document.getElementById("ntpUpdate").placeholder = NTPinterval ;
+                document.getElementById("r2_impuls").placeholder = R2ImpLenght ;
+                
+            }
+        }; 
+        xhr.open("GET", "status", true);
+        xhr.send();
+        }
+    
+    //-----------PERIODICKE SPINANI--------------------------
+    function loadMyPeriodTimes() {
+        var xhr = new XMLHttpRequest();
+        xhr.onreadystatechange = function()    {    
+            if (this.readyState == 4 && this.status == 200)  {
+                var myPeriods = JSON.parse(this.responseText);
+                var checkBoxMondays = myPeriods.myMondays ;
+                var checkBoxTuesdays = myPeriods.myTuesdays ;
+                var checkBoxWednesdays = myPeriods.myWednesdays ;
+                var checkBoxThursdays = myPeriods.myThursdays ;
+                var checkBoxFridays = myPeriods.myFridays ;
+                var checkBoxSaturdays = myPeriods.mySaturdays ;
+                var checkBoxSundays = myPeriods.mySundays ;            
+                var checkBoxControlMondays = myPeriods.myMondaysControl ;
+                var checkBoxControlTuesdays = myPeriods.myTuesdaysControl ;
+                var checkBoxControlWednesdays = myPeriods.myWednesdaysControl ;
+                var checkBoxControlThursdays = myPeriods.myThursdaysControl ;
+                var checkBoxControlFridays = myPeriods.myFridaysControl ;
+                var checkBoxControlSaturdays = myPeriods.mySaturdaysControl ;
+                var checkBoxControlSundays = myPeriods.mySundaysControl ;
+                var PeriodStartTime = myPeriods.StartTime6 ;
+                var PeriodEndTime = myPeriods.EndTime6 ;
+                var PeriodControlStartTime = myPeriods.StartTime7 ;
+                var PeriodControlEndTime = myPeriods.EndTime7 ;
+                
+                if (checkBoxMondays == true){
+                    document.getElementById("CheckMondays").checked = true ;
+                } else {
+                    document.getElementById("CheckMondays").checked = false ;
+                }
+                if (checkBoxTuesdays == true){
+                    document.getElementById("CheckTuesdays").checked = true ;
+                } else {
+                    document.getElementById("CheckTuesdays").checked = false ;
+                }
+                if (checkBoxWednesdays == true){
+                    document.getElementById("CheckWednesdays").checked = true ;
+                } else {
+                    document.getElementById("CheckWednesdays").checked = false ;
+                }
+                if (checkBoxThursdays == true){
+                    document.getElementById("CheckThursdays").checked = true ;
+                } else {
+                    document.getElementById("CheckThursdays").checked = false ;
+                }
+                if (checkBoxFridays == true){
+                    document.getElementById("CheckFridays").checked = true ;
+                } else {
+                    document.getElementById("CheckFridays").checked = false ;
+                }
+                if (checkBoxSaturdays == true){
+                    document.getElementById("CheckSaturdays").checked = true ;
+                } else {
+                    document.getElementById("CheckSaturdays").checked = false ;
+                }
+                if (checkBoxSundays == true){
+                    document.getElementById("CheckSundays").checked = true ;
+                } else {
+                    document.getElementById("CheckSundays").checked = false ;
+                }
+                document.getElementById("startTime6").placeholder = PeriodStartTime;
+                document.getElementById("endTime6").placeholder = PeriodEndTime;
+                                
+                if (checkBoxControlMondays == true){
+                    document.getElementById("CheckMondaysControl").checked = true ;
+                } else {
+                    document.getElementById("CheckMondaysControl").checked = false ;
+                }
+                if (checkBoxControlTuesdays == true){
+                    document.getElementById("CheckTuesdaysControl").checked = true ;
+                } else {
+                    document.getElementById("CheckTuesdaysControl").checked = false ;
+                }
+                if (checkBoxControlWednesdays == true){
+                    document.getElementById("CheckWednesdaysControl").checked = true ;
+                } else {
+                    document.getElementById("CheckWednesdaysControl").checked = false ;
+                }
+                if (checkBoxControlThursdays == true){
+                    document.getElementById("CheckThursdaysControl").checked = true ;
+                } else {
+                    document.getElementById("CheckThursdaysControl").checked = false ;
+                }
+                if (checkBoxControlFridays == true){
+                    document.getElementById("CheckFridaysControl").checked = true ;
+                } else {
+                    document.getElementById("CheckFridaysControl").checked = false ;
+                }
+                if (checkBoxControlSaturdays == true){
+                    document.getElementById("CheckSaturdaysControl").checked = true ;
+                } else {
+                    document.getElementById("CheckSaturdaysControl").checked = false ;
+                }
+                if (checkBoxControlSundays == true){
+                    document.getElementById("CheckSundaysControl").checked = true ;
+                } else {
+                    document.getElementById("CheckSundaysControl").checked = false ;
+                }
+                document.getElementById("startTime7").placeholder = PeriodControlStartTime ;
+                //document.getElementById("endTime7").placeholder = PeriodControlEndTime ;
+                }
+             };
+        xhr.open("GET", "loadPeriodicalTimes", true);
+        xhr.send(); 
+    }
+    
+    //-----------VYJIMKY----------------------
+    function loadExceptionsDates() {
+        var xhr = new XMLHttpRequest();
+        xhr.onreadystatechange = function()    {    
+            if (this.readyState == 4 && this.status == 200)  {
+                var myExcep = JSON.parse(this.responseText);
+                //---------------
+                var myException1 = myExcep.myException1 ;
+                var myException2 = myExcep.myException2 ;
+                var myException3 = myExcep.myException3 ;
+                var myException4 = myExcep.myException4 ;
+                var myException5 = myExcep.myException5 ;
+                
+                //-------------VLASTNI DATUMY---------------
+                document.getElementById("date11").placeholder = myException1 ;
+                document.getElementById("date12").placeholder = myException2 ;
+                document.getElementById("date13").placeholder = myException3 ;
+                document.getElementById("date14").placeholder = myException4 ;
+                document.getElementById("date15").placeholder = myException5 ;
+                //-----------------------
+                }
+             };
+        xhr.open("GET", "loadExceptions", true);
+        xhr.send(); 
+    }
+    //-------------VLASTNI DATUMY------------
+    function loadMyDatesTimes() {
+        var xhr = new XMLHttpRequest();
+        xhr.onreadystatechange = function()    {    
+            if (this.readyState == 4 && this.status == 200)  {
+                var myFunc = JSON.parse(this.responseText);
+                //---------------
+                //checkBoxPeriodicTimes = myFunc.FunctionPeriodic ;
+                var myDate1 = myFunc.myDate1 ;
+                var myDate2 = myFunc.myDate2 ;
+                var myDate3 = myFunc.myDate3 ;
+                var myDate4 = myFunc.myDate4 ;
+                var myDate5 = myFunc.myDate5 ;
+                var myDate6 = myFunc.myDate6 ;
+                var myDate7 = myFunc.myDate7 ;
+                var myDate8 = myFunc.myDate8 ;
+                var myDate9 = myFunc.myDate9 ;
+                var myDate10 = myFunc.myDate10 ;
+                var StartTime1 = myFunc.StartTime1 ;
+                var EndTime1 = myFunc.EndTime1 ;
+                var StartTime2 = myFunc.StartTime2 ;
+                var EndTime2 = myFunc.EndTime2 ;
+                var StartTime3 = myFunc.StartTime3 ;
+                var EndTime3 = myFunc.EndTime3 ;
+                var StartTime4 = myFunc.StartTime4 ;
+                var EndTime4 = myFunc.EndTime4 ;
+                var StartTime5 = myFunc.StartTime5 ;
+                var EndTime5 = myFunc.EndTime5 ;
+                
+                //-------------VLASTNI DATUMY---------------
+                document.getElementById("date1").placeholder = myDate1;
+                document.getElementById("date2").placeholder = myDate2;
+                document.getElementById("startTime1").placeholder = StartTime1;
+                document.getElementById("endTime1").placeholder = EndTime1;
+                document.getElementById("date3").placeholder = myDate3;
+                document.getElementById("date4").placeholder = myDate4;
+                document.getElementById("startTime2").placeholder = StartTime2;
+                document.getElementById("endTime2").placeholder = EndTime2;
+                document.getElementById("date5").placeholder = myDate5;
+                document.getElementById("date6").placeholder = myDate6;
+                document.getElementById("startTime3").placeholder = StartTime3;
+                document.getElementById("endTime3").placeholder = EndTime3;
+                document.getElementById("date7").placeholder = myDate7;
+                document.getElementById("date8").placeholder = myDate8;
+                document.getElementById("startTime4").placeholder = StartTime4;
+                document.getElementById("endTime4").placeholder = EndTime4;
+                document.getElementById("date9").placeholder = myDate9;
+                document.getElementById("date10").placeholder = myDate10;
+                document.getElementById("startTime5").placeholder = StartTime5;
+                document.getElementById("endTime5").placeholder = EndTime5;
+                //-----------------------
+                }
+             };
+        xhr.open("GET", "loadDatesTimes", true);
+        xhr.send(); 
+    }
+    //--------------------------------
+    $("#date1").datepicker({dateFormat: "yy-mm-dd"});
+    $("#date2").datepicker({dateFormat: "yy-mm-dd"});
+    $("#date3").datepicker({dateFormat: "yy-mm-dd"});
+    $("#date4").datepicker({dateFormat: "yy-mm-dd"});
+    $("#date5").datepicker({dateFormat: "yy-mm-dd"});
+    $("#date6").datepicker({dateFormat: "yy-mm-dd"});
+    $("#date7").datepicker({dateFormat: "yy-mm-dd"});
+    $("#date8").datepicker({dateFormat: "yy-mm-dd"});
+    $("#date9").datepicker({dateFormat: "yy-mm-dd"});
+    $("#date10").datepicker({dateFormat: "yy-mm-dd"});
+    $("#date11").datepicker({dateFormat: "yy-mm-dd"});
+    $("#date12").datepicker({dateFormat: "yy-mm-dd"});
+    $("#date13").datepicker({dateFormat: "yy-mm-dd"});
+    $("#date14").datepicker({dateFormat: "yy-mm-dd"});
+    $("#date15").datepicker({dateFormat: "yy-mm-dd"});
+
+</script>
+  
+</body>
+</html>

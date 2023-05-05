@@ -1,0 +1,343 @@
+* {
+  box-sizing: border-box;
+}
+
+body {
+  font-family: Arial;
+  //padding: 10px;
+}
+
+/* Style the top navigation bar */
+.header {
+    //position: fixed ;
+    width: 100% ;
+    height: 70px ;
+    background-color: #0066cc ;
+    color: white ;
+    padding: 1px 20px ;
+    //text-align: justify ;
+    vertical-align: text-top ;
+}
+
+.topnav {
+  overflow: hidden;
+  //position: fixed ;
+  width: 100% ;
+  //top: 0px ;
+  //left: 0px ;
+  background-color: #333 ;
+}
+
+/* Style the topnav links */
+.topnav a {
+  float: left;
+  display: block;
+  color: lightgrey ;
+  text-align: center;
+  padding: 14px 16px;
+  text-decoration: none ;
+  text-transform: uppercase ;
+}
+
+/* Change color on hover */
+.topnav a:hover {
+  background-color: #111 ;
+  color: white ;
+  font-weight: bold ;
+}
+
+input[type=text] {
+  width: 100%;
+  padding: 4px 4px;
+  //margin: 3px 0;
+  text-align: center;
+  box-sizing: border-box;
+  border: 2px solid #ccc;
+  -webkit-transition: 0.5s;
+  transition: 0.5s;
+  outline: none;
+  border-radius: 5px;
+}
+input[type=text]:focus {
+  border: 3px solid #555;
+}
+input[type=checkbox] {
+  width: 20px;
+  padding: 6px 6px;
+  //margin: 3px 0;
+  text-align: center;
+  box-sizing: border-box;
+  border: 2px solid #ccc;
+  -webkit-transition: 0.5s;
+  transition: 0.5s;
+  outline: none;
+  border-radius: 5px;
+}
+
+.card {
+  background-color: white;
+  text-align: left ;
+  padding: 10px;
+  margin-top: 0px;
+  margin-bottom: 0px;
+}
+
+.states {
+  background-color: white;
+  padding: 10px;
+  margin-top: 0px;
+  margin-bottom: 0px;
+}
+#dev_states {
+  font-family: Arial, Helvetica, sans-serif;
+  border-collapse: collapse;
+  width: 100%;
+}
+#dev_states td, dev_states th {
+    // background-color: white ;
+  //border: 1px solid #ddd;
+  text-align: left;
+  padding: 4px;
+}
+#dev_states tr:nth-child(even){background-color: #f2f2f2;}
+#dev_states tr:nth-child(odd){background-color: white;}
+#dev_states tr:hover {background-color: #ddd;}
+#dev_states th {
+  padding-top: 6px;
+  padding-bottom: 6px;
+  text-align: left;
+  width: 50%;
+  //background-color: #04AA6D;
+  color: black ;
+}
+
+.timers {
+  background-color: white;
+}
+
+.timers input {
+    //width: 80px;
+    //border: 1px solid;
+}
+
+.PeriodicTimesTable {
+    background-color: white ;
+    //border: 1px solid;
+    padding: 10px;
+    // text-align: center ;
+}
+.PeriodicTimesTable th, .PeriodicTimesTable td{
+    width: 100px;
+    padding: 2px 8px;
+    text-align: center ;
+}
+
+#periods {
+    font-family: Arial, Helvetica, sans-serif;
+    //border-collapse: collapse;
+    //width: 100%;
+    width: 60px;
+    text-align: center ;
+}
+
+.HolidaysTimesTable {
+    //background-color: white ;
+    background-color: #d9d9d9 ;
+    //font-family: Arial, Helvetica, sans-serif;
+    //border: 1px solid;
+    padding: 10px;
+    //font-size: 12px ;
+}
+#holidays {
+  font-family: Arial, Helvetica, sans-serif;
+  border-collapse: collapse;
+  width: 100%;
+}
+#holidays td, #holidays th {
+    // background-color: white ;
+  border: 1px solid #ddd;
+  padding: 4px;
+}
+#holidays tr:nth-child(even){background-color: #f2f2f2;}
+#holidays tr:nth-child(odd){background-color: white;}
+#holidays tr:hover {background-color: #ddd;}
+#holidays th {
+  padding-top: 6px;
+  padding-bottom: 6px;
+  text-align: left;
+  background-color: #04AA6D;
+  color: white;
+}
+.ExceptionsTable {
+    background-color: white ;
+    //background-color: #d9d9d9 ;
+    //border: 1px solid;
+    padding: 10px;
+    //font-size: 12px ;
+}
+
+.myDatesTimesTable {
+    //background-color: white ;
+    background-color: #d9d9d9 ;
+    //border: 1px solid;
+    padding: 10px;
+}
+
+.ControlTimesTable {
+    background-color: white ;
+    //border: 1px solid;
+    padding: 10px;
+}
+
+.MyDatesControl {
+    background-color: #d9d9d9 ;
+    //border: 1px solid;
+    padding: 10px;
+}
+
+.settings {
+  background-color: white;
+}
+
+.bi {
+  padding: 10px;
+  font-size: 20px;
+  width: 30px;
+  text-align: center;
+  text-decoration: none;
+  border-radius: 50%;
+}
+
+.bi-arrow-repeat {
+  background: white ;
+  color: black ;
+}
+.bi-briefcase {
+  background: #0066ff ;
+  color: white ;
+}
+.bi-lock {
+  background: white ;
+  color: black ;
+}
+.bi-calendar3 {
+  background: #0066ff ;
+  color: white ;
+}
+
+input[type=submit] {
+  background-color: #04AA6D;
+  color: white;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 16px;
+  padding: 10px 10px 10px 10px;
+  //padding-bottom: 10px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  float: left ;
+  margin: 4px 2px;
+}
+
+.WifiButton {
+  background-color: #d62a1e; 
+  border: none;
+  border-radius: 4px;
+  color: white;
+  padding: 10px 10px 10px 10px;
+  text-align: center;
+  text-decoration: none;
+  float: left ;
+  display: inline-block;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 16px;
+  cursor: pointer;
+  margin: 4px 2px;
+  -webkit-transition-duration: 0.4s; /* Safari */
+  transition-duration: 0.4s;
+}
+
+.EepromButton {
+  background-color: #d62a1e;
+  border: none;
+  border-radius: 4px;
+  color: white;
+  padding: 10px 10px 10px 10px;
+  text-align: center;
+  text-decoration: none;
+  float: left ;
+  display: inline-block;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 16px;
+  cursor: pointer;
+  margin: 4px 2px;
+  -webkit-transition-duration: 0.4s; /* Safari */
+  transition-duration: 0.4s;
+}
+
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 60px;
+  height: 34px;
+}
+
+.switch input { 
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #ccc;
+  -webkit-transition: .4s;
+  transition: .4s;
+}
+
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 26px;
+  width: 26px;
+  left: 4px;
+  bottom: 4px;
+  background-color: white;
+  -webkit-transition: .4s;
+  transition: .4s;
+}
+
+input:checked + .slider {
+  background-color: #ff3300 ;
+}
+
+input:focus + .slider {
+  box-shadow: 0 0 1px #ff3300 ;
+}
+
+input:checked + .slider:before {
+  -webkit-transform: translateX(26px);
+  -ms-transform: translateX(26px);
+  transform: translateX(26px);
+}
+
+/* Responsive layout - when the screen is less than 800px wide, make the two columns stack on top of each other instead of next to each other */
+@media screen and (max-width: 800px) {
+  .leftcolumn, .rightcolumn {   
+    width: 100%;
+    padding: 0;
+  }
+}
+
+/* Responsive layout - when the screen is less than 400px wide, make the navigation links stack on top of each other instead of next to each other */
+@media screen and (max-width: 400px) {
+  .topnav a {
+    float: none;
+    width: 100%;
+  }
+}
